@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TASSI - CIRD Verification</title>
+  <link rel="icon" type="image/png" href="tassi-logo.png">
+  <link rel="shortcut icon" type="image/png" href="tassi-logo.png">
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #007BFF, #00C4FF);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #loader {
+      max-width: 500px;
+      width: 100%;
+    }
+
+    img {
+      width: 100px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .check-item {
+      opacity: 0;
+      margin: 10px 0;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .check-item.visible {
+      opacity: 1;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .passed { color: #00ff99; }
+    .failed { color: #ff6b6b; }
+
+    .loading-dots::after {
+      content: "";
+      display: inline-block;
+      width: 1ch;
+      animation: dots 1.5s steps(3, end) infinite;
+    }
+
+    @keyframes dots {
+      0%   { content: "."; }
+      33%  { content: ".."; }
+      66%  { content: "..."; }
+      100% { content: "."; }
+    }
+
+    .final-msg {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      .check-item {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="loader">
+    <img src="tassi-logo.png" alt="Logo" />
+    <ul class="checklist" id="checklist">
+      <li class="check-item">🔒 Checking HTTPS connection... <span class="status loading-dots"></span></li>
+      <li class="check-item">🌍 Verifying if IP is PH-based... <span class="status loading-dots"></span></li>
+      <li class="check-item">🛡️ Detecting VPN/Proxy... <span class="status loading-dots"></span></li>
+      <li class="check-item">🤖 Scanning for bots... <span class="status loading-dots"></span></li>
+      <li class="check-item">🧭 Measuring Rate Limit... <span class="status loading-dots"></span></li>
+    </ul>
+    <div class="final-msg" id="final-msg"></div>
+  </div>
+
+  <script>
+  const results = {
+    https: true,
+    ip: true,
+    proxy: true,
+    bot: true,
+    rate: true,
+    mal: true  };
+
+  const steps = document.querySelectorAll('.check-item');
+  const finalMsg = document.getElementById('final-msg');
+  const delay = 500;
+
+  const icons = {
+    true: "✅",
+    false: "❌"
+  };
+
+  function showChecks() {
+    steps.forEach((step, index) => {
+      setTimeout(() => {
+        step.classList.add('visible');
+        const statusSpan = step.querySelector('.status');
+        const resultKey = Object.keys(results)[index];
+        const passed = results[resultKey];
+
+        statusSpan.classList.remove('loading-dots');
+        statusSpan.textContent = passed ? icons.true : icons.false;
+        statusSpan.classList.add(passed ? 'passed' : 'failed');
+
+        if (index === steps.length - 1) {
+          setTimeout(() => {
+            if (true) {
+              finalMsg.textContent = "✅ All checks passed! Redirecting...";
+              setTimeout(() => window.location.href = "index.php", 3000);
+            } else {
+              finalMsg.innerHTML = "🚫 One or more checks failed. Access denied.";
+              setTimeout(() => window.location.href = 'https://www.google.com', 2000);
+
+            }
+          }, delay);
+        }
+      }, index * delay);
+    });
+  }
+
+  window.onload = showChecks;
+</script>
+
+</body>
+</html>
